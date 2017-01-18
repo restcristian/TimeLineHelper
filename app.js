@@ -3,19 +3,21 @@ var TimeLine = function() {
     var self = this,
         animationList,
         animationTotalDuration,
-        sequenceInterval = {};
+        sequenceInterval = function() {};
 
     self.init = function() {
         animationList = [];
         animationTotalDuration = 0;
     };
 
-    self.add = function(DOMElement, animationDuration, animationClass, callBack) {
+    self.add = function(options, callBack) {
         var animation = {};
-        animation.DOMElement = DOMElement;
-        animation.animationDuration = animationDuration || 0;
-        // animation.callBack = callBack;
-        animation.animationClass = animationClass;
+
+        animation.DOMElement = options.DOMElement;
+        animation.animationDuration = options.animationDuration || 0;
+        animation.callBack = callBack;
+        animation.animationClass = options.animationClass;
+        animation.animationDelay = options.animationDelay || 0;
         animationList.push(animation);
         animationTotalDuration = animationList.reduce(function(an1, an2) {
             return an1.animationDuration + an2.animationDuration;
@@ -28,9 +30,6 @@ var TimeLine = function() {
     self.play = function() {
         var currentDuration = 0,
             currentIdx = 1;
-
-
-        // animationList[0].callBack();
 
         animationList[0].DOMElement.style.WebkitTransitionDuration = animationList[0].animationDuration + 's';
         animationList[0].DOMElement.style.transitionDuration = animationList[0].animationDuration + 's';
@@ -58,6 +57,10 @@ var TimeLine = function() {
 
     };
 
+    self.reset = function() {
+
+    };
+
     (function() {
         self.init();
     })();
@@ -68,10 +71,29 @@ window.addEventListener('load', function() {
     var boxTL = new TimeLine(),
         box = document.getElementById('box1');
 
-    boxTL.add(box, 2, 'scaleDouble');
-    boxTL.add(box, 4, 'background1');
-    boxTL.add(box, 5, 'background2');
-    boxTL.add(box, 6, 'background3');
+    boxTL.add({
+        DOMElement: box,
+        animationDuration: 3,
+        animationClass: 'scaleDouble'
+    });
+
+    boxTL.add({
+        DOMElement: box,
+        animationDuration: 2,
+        animationClass: 'background1'
+    });
+
+    boxTL.add({
+        DOMElement: box,
+        animationDuration: 2,
+        animationClass: 'background2'
+    });
+
+    boxTL.add({
+        DOMElement: box,
+        animationDuration: 2,
+        animationClass: 'background3'
+    });
 
     boxTL.play();
 
