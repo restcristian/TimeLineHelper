@@ -19,11 +19,11 @@ var TimeLine = function() {
         animation.animationClass = options.animationClass;
         animation.animationDelay = options.animationDelay || 0;
         animationList.push(animation);
-        animationTotalDuration = animationList.reduce(function(an1, an2) {
-            return an1.animationDuration + an2.animationDuration;
-        });
+        animationTotalDuration = animationList.reduce(function(total, animation) {
+            return total + animation.animationDuration;
+        },0);
 
-        console.log(animation);
+        console.log('animationTotalDuration',animationTotalDuration);
         // self.play();
     };
 
@@ -31,10 +31,8 @@ var TimeLine = function() {
         var currentDuration = 0,
             currentIdx = 1;
 
-        animationList[0].DOMElement.style.WebkitTransitionDuration = animationList[0].animationDuration + 's';
-        animationList[0].DOMElement.style.transitionDuration = animationList[0].animationDuration + 's';
-        animationList[0].DOMElement.classList.add(animationList[0].animationClass);
-        console.log(animationList[0]);
+       
+       self.animateAt(0);
 
         if (animationList.length > 1) {
 
@@ -43,18 +41,32 @@ var TimeLine = function() {
                 if (currentIdx < animationList.length) {
                     //animationList[scope.idx].callBack();
                     console.debug('sequence:', animationList[currentIdx]);
-                    animationList[currentIdx].DOMElement.style.WebkitTransitionDuration = animationList[currentIdx].animationDuration + 's';
-                    animationList[currentIdx].DOMElement.style.transitionDuration = animationList[currentIdx].animationDuration + 's';
-                    animationList[currentIdx].DOMElement.classList.add(animationList[currentIdx].animationClass);
-                    currentIdx++;
+                    self.animateAt(currentIdx++);
+                    console.debug('CurrentIDX:', currentIdx);
                 } else {
                     clearInterval(sequenceInterval);
+                    // self.playReverse();
+
                 }
 
             }, currentDuration += (animationList[currentIdx].animationDuration * 1000));
 
         }
 
+    };
+
+    self.animateAt = function(idx){
+        animationList[idx].DOMElement.style.WebkitTransitionDuration = animationList[idx].animationDuration + 's';
+        animationList[idx].DOMElement.style.transitionDuration = animationList[idx].animationDuration + 's';
+        animationList[idx].DOMElement.classList.add(animationList[idx].animationClass);
+    };
+
+    self.playReverse = function() {
+        console.log('Play Reverse called');
+        for (var idx = animationList.length - 1; idx >= 0; idx--) {
+            console.debug('Reverse', animationList[idx].DOMElement);
+            animationList[idx].DOMElement.classList.remove(animationList[idx].animationClass);
+        }
     };
 
     self.reset = function() {
@@ -95,6 +107,24 @@ window.addEventListener('load', function() {
         animationClass: 'background3'
     });
 
-    boxTL.play();
+    boxTL.add({
+        DOMElement: box,
+        animationDuration: 2,
+        animationClass: 'fadeOut'
+    });
+
+    boxTL.add({
+        DOMElement: box,
+        animationDuration: 2,
+        animationClass: 'fadeIn'
+    });
+
+    boxTL.add({
+        DOMElement: box,
+        animationDuration: 2,
+        animationClass: 'scaleNormal'
+    });
+
+   // boxTL.play();
 
 });
